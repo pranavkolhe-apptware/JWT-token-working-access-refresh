@@ -49,14 +49,17 @@ app.post("/login", async (req, res) => {
 
   const accessToken = generateAccessToken({ username });
   const refreshToken = generateRefreshToken({ username });
-  console.log("refreshTokens :",refreshTokens);
+  console.log("refreshTokens :",refreshToken);
   console.log("accessToken :",accessToken);
-  res.json({ accessToken, refreshToken });
+  res.cookie("refreshToken", refreshToken, { httpOnly: true, sameSite: "lax", secure: false });
+  res.json({ accessToken });
 });
 
 // Refresh Token API
 app.post("/refresh", (req, res) => {
-  const { token } = req.body;
+  // const { token } = req.body;
+  const token = req.cookies.refreshToken;
+  console.log("refresh token consoled in /refresh for testing :",token);
   if (!token || !refreshTokens.includes(token)) {
     return res.status(403).json({ error: "Access Denied" });
   }
